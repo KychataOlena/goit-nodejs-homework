@@ -38,7 +38,8 @@ const contactAddSchema = Joi.object({
     .messages({ "any.required": `missing required name field` }),
   phone: Joi.string()
     .required()
-    .messages({ "any.required": `missing required name field` }),
+    .messages({ "any.required": `missing required phone field` }),
+  favorite: Joi.boolean(),
 });
 
 const updateFavoriteSchema = Joi.object({
