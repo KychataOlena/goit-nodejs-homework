@@ -8,6 +8,9 @@ const { validateBody } = require("../../utils");
 
 const { authenticate, upload } = require("../../middlewares");
 
+const { authenticate } = require("../../middlewares");
+
+
 const router = express.Router();
 
 router.post("/register", validateBody(schemas.registerSchems), ctrl.register);
@@ -24,5 +27,9 @@ router.patch(
   upload.single("avatar"),
   ctrl.updateAvatar
 );
+
+
+router.post("/logout", authenticate, ctrl.logout);
+
 
 module.exports = router;

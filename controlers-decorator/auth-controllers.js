@@ -1,6 +1,7 @@
 const bcrypt = require("bcryptjs");
 
 const jwt = require("jsonwebtoken");
+
 const gravatar = require("gravatar");
 
 const fs = require("fs/promises");
@@ -11,6 +12,11 @@ const Jimp = require("jimp");
 const { SECRET_KEY } = process.env;
 
 const avatarsDir = path.join(__dirname, "../", "public", "avatars");
+
+
+
+const { SECRET_KEY } = process.env;
+
 
 const { ctrlWrapper } = require("../utils");
 
@@ -26,6 +32,7 @@ const register = async (req, res) => {
   }
 
   const hashPassword = await bcrypt.hash(password, 10);
+
   const avatarURL = gravatar.url(email);
 
   const result = await User.create({
@@ -33,6 +40,9 @@ const register = async (req, res) => {
     password: hashPassword,
     avatarURL,
   });
+
+  const result = await User.create({ ...req.body, password: hashPassword });
+
 
   res.status(201).json({
     email: result.email,
@@ -100,10 +110,13 @@ const updateAvatar = async (req, res) => {
 
   res.json({ avatarURL });
 };
+
 module.exports = {
   register: ctrlWrapper(register),
   login: ctrlWrapper(login),
   getCurrent: ctrlWrapper(getCurrent),
   logout: ctrlWrapper(logout),
+
   updateAvatar: ctrlWrapper(updateAvatar),
+
 };
