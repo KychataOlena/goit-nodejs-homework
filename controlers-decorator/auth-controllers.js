@@ -9,20 +9,17 @@ const path = require("path");
 
 const Jimp = require("jimp");
 
-const { SECRET_KEY } = process.env;
+const { SECRET_KEY, PROJECT_URL } = process.env;
 
 const avatarsDir = path.join(__dirname, "../", "public", "avatars");
 
-
-
-const { SECRET_KEY } = process.env;
-
-
 const { ctrlWrapper } = require("../utils");
 
-const { HttpError } = require("../helpers");
+const { HttpError, sendEmail } = require("../helpers");
 
 const { User } = require("../models/user");
+
+const { nanoid } = require("nanoid");
 
 const register = async (req, res) => {
   const { email, password } = req.body;
@@ -32,17 +29,23 @@ const register = async (req, res) => {
   }
 
   const hashPassword = await bcrypt.hash(password, 10);
-
   const avatarURL = gravatar.url(email);
+
+  const varificationCode = nanoid();
 
   const result = await User.create({
     ...req.body,
     password: hashPassword,
     avatarURL,
+    varificationCode,
   });
+  const verifyEmail = {
+    to: email,
+    subject: "Verify email",
+    html: `<a target="bllank" href="${PROJECT_URL}/api/auth/verify/${varificationCode}">Click verify email </a>`,
+  };
 
-  const result = await User.create({ ...req.body, password: hashPassword });
-
+  await sendEmail(verifyEmail);
 
   res.status(201).json({
     email: result.email,
@@ -68,6 +71,10 @@ const login = async (req, res) => {
 
   res.json({
     token,
+    user: {
+      email,
+      subscription: user.subscription,
+    },
   });
 };
 
@@ -118,5 +125,4 @@ module.exports = {
   logout: ctrlWrapper(logout),
 
   updateAvatar: ctrlWrapper(updateAvatar),
-
 };

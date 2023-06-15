@@ -11,9 +11,11 @@ const ContactSchema = new Schema(
     },
     email: {
       type: String,
+      required: true,
     },
     phone: {
       type: String,
+      required: true,
     },
     favorite: {
       type: Boolean,
@@ -38,12 +40,8 @@ const contactAddSchema = Joi.object({
     .messages({ "any.required": `missing required name field` }),
   phone: Joi.string()
     .required()
-
     .messages({ "any.required": `missing required phone field` }),
   favorite: Joi.boolean(),
-
-    .messages({ "any.required": `missing required name field` }),
-
 });
 
 const updateFavoriteSchema = Joi.object({
