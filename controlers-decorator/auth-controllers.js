@@ -65,7 +65,7 @@ const verify = async (req, res) => {
   });
 
   res.json({
-    message: "Verify success",
+    message: "Verification successful",
   });
 };
 
@@ -76,7 +76,7 @@ const resendVerifyEmail = async (req, res) => {
     throw HttpError(404);
   }
   if (user.verify) {
-    throw HttpError(400, "Email already verify");
+    throw HttpError(400, "Verification has already been passed");
   }
   const verifyEmail = {
     to: email,
@@ -86,16 +86,20 @@ const resendVerifyEmail = async (req, res) => {
   await sendEmail(verifyEmail);
 
   res.json({
-    message: "Verify email send",
+    message: "Verify email sent",
   });
 };
 
 const login = async (req, res) => {
   const { email, password } = req.body;
   const user = await User.findOne({ email });
-  if (!user || !user.verify) {
+  if (!user) {
     throw HttpError(401, "Email or password invalid");
   }
+  if (!user.verify) {
+    throw HttpError(401, "User is not verified");
+  }
+
   const passwordCompare = await bcrypt.compare(password, user.password);
   if (!passwordCompare) {
     throw HttpError(401, "Email or password invalid");
