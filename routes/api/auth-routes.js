@@ -7,13 +7,19 @@ const { schemas } = require("../../models/user");
 const { validateBody } = require("../../utils");
 
 const { authenticate, upload } = require("../../middlewares");
-
-const { authenticate } = require("../../middlewares");
-
+// const authControllers = require("../../auth-controllers");
 
 const router = express.Router();
 
 router.post("/register", validateBody(schemas.registerSchems), ctrl.register);
+
+router.get("/verify/:verificationCode", ctrl.verify);
+
+router.post(
+  "/verify",
+  validateBody(schemas.userEmailSchema),
+  ctrl.resendVerifyEmail
+);
 
 router.post("/login", validateBody(schemas.loginSchems), ctrl.login);
 
@@ -28,8 +34,6 @@ router.patch(
   ctrl.updateAvatar
 );
 
-
 router.post("/logout", authenticate, ctrl.logout);
-
 
 module.exports = router;
